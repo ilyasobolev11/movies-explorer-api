@@ -18,7 +18,7 @@ mongoose.connect(DB_CONNECT, {
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(); // TODO: routes
+// app.use(); TODO: routes
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
