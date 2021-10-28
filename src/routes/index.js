@@ -5,19 +5,20 @@ const { usersRouter } = require('./users');
 const { moviesRouter } = require('./movies');
 const { createUser, loginUser, logoutUser } = require('../controllers/users');
 const { authUser } = require('../middlewares/auth');
+const { creareUserReqValidator, loginUserReqValidator, authReqValidator } = require('../middlewares/reqValidator');
 
-routes.post('/signup', createUser);
-routes.post('signin', loginUser);
+routes.get('/', (req, res) => {
+  res.status(200).json({ message: 'Connected' });
+});
+routes.post('/signup', creareUserReqValidator, createUser);
+routes.post('/signin', loginUserReqValidator, loginUser);
 
-routes.use(authUser);
+routes.use(authReqValidator, authUser);
 
 routes.use('/users', usersRouter);
 routes.use('/movies', moviesRouter);
 routes.delete('/signout', logoutUser);
 
-routes.get('/', (req, res) => {
-  res.status(200).json({ message: 'Connected' });
-});
 routes.all('*', (req, res, next) => {
   next(new NoDataFoundError());
 });
