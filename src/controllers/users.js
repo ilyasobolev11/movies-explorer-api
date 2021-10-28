@@ -1,23 +1,83 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { NoDataFoundError, BadRequestError } = require('../errors');
+const { NoDataFoundError, BadRequestError, ConflictError } = require('../errors');
 
 const User = require('../models/user');
 // TODO: add deleteTechProperties?
 
 const { JWT_SECRET = 'dev-secret' } = process.env;
 
-// async function createUser(req, res, next) {
+async function createUser(req, res, next) {
+  try {
+    const {
+      email,
+      password,
+      name,
+    } = req.body;
 
-// }
+    const passwordHash = await bcrypt.hash(password, 10);
 
-// async function loginUser(req, res, next) {
+    const user = await User.create(
+      {
+        email,
+        name,
+        password: passwordHash,
+      },
+    );
 
-// }
+    res.status(201).send(user);
+  } catch (err) {
+    if (err.name === 'MongoServerError' && err.code === 11000) {
+      next(new ConflictError(`Пользователь с ${Object.values(err.keyValue).join(', ')} уже существует`));
+      return;
+    }
+    if (err.name === 'ValidationError') {
+      next(new BadRequestError());
+      return;
+    }
+    next(err);
+  }
+}
 
-// function logoutUser(req, res, next) {
+async function loginUser(req, res, next) {
+  try {
+    const credentials = req.body;
 
-// }
+    const user = await User.findUserByCredentials(credentials);
+
+    const token = jwt.sign(
+      { _id: user._id },
+      JWT_SECRET,
+      { expiresIn: '7d' },
+    );
+
+    res
+      .status(204)
+      .cookie(
+        'jwt',
+        token,
+        {
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        },
+      )
+      .end();
+  } catch (err) {
+    next(err);
+  }
+}
+
+function logoutUser(req, res, next) {
+  try {
+    res
+      .status(204)
+      .clearCookie('jwt')
+      .end();
+  } catch (err) {
+    next(err);
+  }
+}
 
 async function getCurrentUser(req, res, next) {
   try {
@@ -50,6 +110,10 @@ async function updateCurrentUser(req, res, next) {
   } catch (err) {
     // TODO: отловить ошибку с одинаковыми email
     // TODO: отлов ошибки по одному свойству - code?
+    if (err.name === 'MongoServerError' && err.code === 11000) {
+      next(new ConflictError(`Пользователь с ${Object.values(err.keyValue).join(', ')} уже существует`));
+      return;
+    }
     if (err.name === 'ValidationError') {
       next(new BadRequestError());
       return;
@@ -59,6 +123,9 @@ async function updateCurrentUser(req, res, next) {
 }
 
 module.exports = {
+  createUser,
+  loginUser,
+  logoutUser,
   getCurrentUser,
   updateCurrentUser,
 };
