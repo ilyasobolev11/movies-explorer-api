@@ -4,9 +4,12 @@ const { NoDataFoundError } = require('../errors');
 const { usersRouter } = require('./users');
 const { moviesRouter } = require('./movies');
 const { createUser, loginUser, logoutUser } = require('../controllers/users');
+const { authUser } = require('../middlewares/auth');
 
 routes.post('/signup', createUser);
 routes.post('signin', loginUser);
+
+routes.use(authUser);
 
 routes.use('/users', usersRouter);
 routes.use('/movies', moviesRouter);
