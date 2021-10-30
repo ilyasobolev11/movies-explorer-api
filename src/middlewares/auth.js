@@ -4,12 +4,12 @@ const { AuthError } = require('../errors');
 
 const { JWT_SECRET = 'dev-secret' } = process.env;
 
-function authUser(res, req, next) {
+function authUser(req, res, next) {
   try {
     const token = req.cookies.jwt;
 
     const payload = jwt.verify(token, JWT_SECRET);
-    req.user._id = payload;
+    req.user = payload;
 
     next();
   } catch (err) {
