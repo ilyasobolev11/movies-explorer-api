@@ -2,13 +2,13 @@ const { celebrate, Joi } = require('celebrate');
 const { AuthError } = require('../errors');
 
 const cookiesShema = Joi.object().keys({
-  jwt: Joi.string().required().token().error(new AuthError()),
+  jwt: Joi.string().required().error(new AuthError()),
 });
 
 const authReqValidator = (req, res, next) => {
   const { cookies } = req;
 
-  const { err } = cookiesShema.validate(cookies);
+  const { error: err } = cookiesShema.validate(cookies);
 
   if (err) {
     next(err);
