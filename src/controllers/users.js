@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { NoDataFoundError, BadRequestError, ConflictError } = require('../errors');
 
 const User = require('../models/user');
-// TODO: add deleteTechProperties?
+const { deleteTechProperties } = require('../utils/deleteTechProperties');
 
 const { JWT_SECRET = 'dev-secret' } = process.env;
 
@@ -25,7 +25,7 @@ async function createUser(req, res, next) {
       },
     );
 
-    res.status(201).send(user);
+    res.status(201).send(deleteTechProperties(user));
   } catch (err) {
     if (err.name === 'MongoServerError' && err.code === 11000) {
       next(new ConflictError(`Пользователь с ${Object.values(err.keyValue).join(', ')} уже существует`));
@@ -87,7 +87,7 @@ async function getCurrentUser(req, res, next) {
       .findById(userId)
       .orFail(new NoDataFoundError('Пользователя с таким id не существует'));
 
-    res.status(200).send(user);
+    res.status(200).send(deleteTechProperties(user));
   } catch (err) {
     next(err);
   }
@@ -106,10 +106,8 @@ async function updateCurrentUser(req, res, next) {
       )
       .orFail(new NoDataFoundError('Пользователя с таким id не существует'));
 
-    res.status(200).send(user);
+    res.status(200).send(deleteTechProperties(user));
   } catch (err) {
-    // TODO: отловить ошибку с одинаковыми email
-    // TODO: отлов ошибки по одному свойству - code?
     if (err.name === 'MongoServerError' && err.code === 11000) {
       next(new ConflictError(`Пользователь с ${Object.values(err.keyValue).join(', ')} уже существует`));
       return;
