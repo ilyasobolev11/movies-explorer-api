@@ -18,6 +18,8 @@ const {
 } = process.env;
 
 const corsWhiteList = [
+  'http://movies-explorer-app.nomoredomains.work',
+  'https://movies-explorer-app.nomoredomains.work',
   'http://localhost:3000',
   'https://localhost:3000',
 ];
