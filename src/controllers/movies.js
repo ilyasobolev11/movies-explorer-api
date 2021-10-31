@@ -1,5 +1,5 @@
 const Movie = require('../models/movie');
-const { NoDataFoundError, ForbiddenError } = require('../errors');
+const { NoDataFoundError, ForbiddenError, BadRequestError } = require('../errors');
 const { deleteTechProperties } = require('../utils/deleteTechProperties');
 
 async function addMovie(req, res, next) {
@@ -10,6 +10,10 @@ async function addMovie(req, res, next) {
     movie = await Movie.create({ ...movie, owner });
     res.status(201).send(deleteTechProperties(movie));
   } catch (err) {
+    if (err.name === 'ValidationError') {
+      next(new BadRequestError());
+      return;
+    }
     next(err);
   }
 }

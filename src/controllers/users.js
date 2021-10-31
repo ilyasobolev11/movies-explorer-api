@@ -4,8 +4,7 @@ const { NoDataFoundError, BadRequestError, ConflictError } = require('../errors'
 
 const User = require('../models/user');
 const { deleteTechProperties } = require('../utils/deleteTechProperties');
-
-const { JWT_SECRET = 'dev-secret' } = process.env;
+const { JWT_SECRET } = require('../config');
 
 async function createUser(req, res, next) {
   try {

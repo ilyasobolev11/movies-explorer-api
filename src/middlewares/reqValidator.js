@@ -1,9 +1,16 @@
 const { celebrate, Joi } = require('celebrate');
+const { isURL } = require('validator');
+
 const { AuthError } = require('../errors');
 
 const cookiesShema = Joi.object().keys({
   jwt: Joi.string().required().error(new AuthError()),
 });
+
+const validateURL = (value, helpers) => {
+  if (isURL(value)) return value;
+  return helpers.message(`${helpers.state.path} - задан некорректный URL`);
+};
 
 const authReqValidator = (req, res, next) => {
   const { cookies } = req;
@@ -46,10 +53,10 @@ const addMovieReqValidator = celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required().uri(),
-    trailer: Joi.string().required().uri(),
-    thumbnail: Joi.string().required().uri(),
-    moviedId: Joi.number().required(),
+    image: Joi.string().required().custom(validateURL),
+    trailer: Joi.string().required().custom(validateURL),
+    thumbnail: Joi.string().required().custom(validateURL),
+    movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
   }),

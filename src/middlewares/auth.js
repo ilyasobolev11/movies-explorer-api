@@ -1,8 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const { AuthError } = require('../errors');
-
-const { JWT_SECRET = 'dev-secret' } = process.env;
+const { JWT_SECRET } = require('../config');
 
 function authUser(req, res, next) {
   try {

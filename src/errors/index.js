@@ -1,8 +1,4 @@
-const BAD_REQUEST = 400;
-const UNAUTHORIZED = 401;
-const FORBIDDEN = 403;
-const NOT_FOUND = 404;
-const CONFLICT = 409;
+const { ERR_CODE } = require('../utils/constants');
 
 class CustomError extends Error {
   constructor(message) {
@@ -16,35 +12,35 @@ class HttpError extends CustomError {}
 class BadRequestError extends HttpError {
   constructor(message) {
     super(message ?? 'Переданы некорректные данные');
-    this.statusCode = BAD_REQUEST;
+    this.statusCode = ERR_CODE.BAD_REQUEST;
   }
 }
 
 class AuthError extends HttpError {
   constructor(message) {
     super(message ?? 'Необходима аутентификация');
-    this.statusCode = UNAUTHORIZED;
+    this.statusCode = ERR_CODE.UNAUTHORIZED;
   }
 }
 
 class ForbiddenError extends HttpError {
   constructor(message) {
     super(message ?? 'Недостаточно прав');
-    this.statusCode = FORBIDDEN;
+    this.statusCode = ERR_CODE.FORBIDDEN;
   }
 }
 
 class NoDataFoundError extends HttpError {
   constructor(message) {
     super(message ?? 'Запрашиваемый ресурс не найден');
-    this.statusCode = NOT_FOUND;
+    this.statusCode = ERR_CODE.NOT_FOUND;
   }
 }
 
 class ConflictError extends HttpError {
   constructor(message) {
     super(message ?? 'Невозможно выполнить');
-    this.statusCode = CONFLICT;
+    this.statusCode = ERR_CODE.CONFLICT;
   }
 }
 

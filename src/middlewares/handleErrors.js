@@ -1,12 +1,12 @@
-const INTERNAL_SERVER_ERROR = 500;
+const { ERR_CODE } = require('../utils/constants');
 
 function handleErrors(err, req, res, next) {
-  const { statusCode = INTERNAL_SERVER_ERROR, message } = err;
+  const { statusCode = ERR_CODE.INTERNAL_SERVER, message } = err;
 
   res
     .status(statusCode)
     .send({
-      message: statusCode === INTERNAL_SERVER_ERROR
+      message: statusCode === ERR_CODE.INTERNAL_SERVER
         ? 'На сервере произошла ошибка'
         : message,
     });
